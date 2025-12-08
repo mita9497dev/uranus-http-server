@@ -1,0 +1,8 @@
+.vscode/
+vendor/
+composer.lock
+./database/
+./languages/
+./public/
+./.env
+/starter-kit/

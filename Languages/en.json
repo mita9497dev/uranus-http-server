@@ -1,0 +1,20 @@
+{
+    "welcome_message": "Welcome to our website!",
+    "user_profile": {
+        "greeting": "Hello, {name}!",
+        "age_info": "You are {age} years old."
+    },
+    "error_messages": {
+        "404": "Page not found.",
+        "500": "Internal server error. Please try again later."
+    },
+    "form_labels": {
+        "username": "Username",
+        "password": "Password",
+        "submit": "Submit"
+    },
+    "notifications": {
+        "success": "Operation completed successfully!",
+        "failure": "Operation failed. Please try again."
+    }
+}

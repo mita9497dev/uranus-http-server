@@ -1,0 +1,11 @@
+<?php
+namespace $NAMESPACE;
+/**
+ * @OA\Info(
+ *     title="$PROJECT_NAME",
+ *     version="$VERSION",
+ *     description="$DESCRIPTION",
+ * )
+ */
+
+class ApiInfo {}

@@ -1,0 +1,60 @@
+#!/usr/bin/env php
+<?php
+
+use Mita\UranusHttpServer\Server;
+
+try {
+    $baseDirs = [
+        getcwd(),
+        __DIR__, 
+    ];
+
+    $autoloadFile = null;
+    foreach ($baseDirs as $baseDir) {
+        $potentialAutoloadPaths = [
+            $baseDir . '/../../vendor/autoload.php',
+            $baseDir . '/../vendor/autoload.php',
+            $baseDir . '/vendor/autoload.php'
+        ];
+        
+        foreach ($potentialAutoloadPaths as $path) {
+            if (file_exists($path)) {
+                $autoloadFile = $path;
+                break 2;
+            }
+        }
+    }
+
+    if ($autoloadFile === null) {
+        throw new InvalidArgumentException("Autoload file not found");
+    }
+
+    require $autoloadFile;
+
+    foreach ($baseDirs as $baseDir) {
+        if (file_exists($baseDir . '/src/Configs/DefaultConfig.php')) {
+            $config = require $baseDir . '/src/Configs/DefaultConfig.php';
+            break;
+        } else if (file_exists($baseDir . '/src/Configs/Config.php')) {
+            $config = require $baseDir . '/src/Configs/Config.php';
+            break;
+        } 
+    }
+    
+    define('ROOT_DIR', $baseDir);
+
+    if (file_exists($baseDir . '/public/bootstrap.php')) {
+        $server = require $baseDir . '/public/bootstrap.php';
+    } else {
+        $server = new Server($config ?? []);
+    }
+    
+    $server->boot();
+    $server->getConsoleKernel()->registerCommands();
+    $server->runConsole();
+    
+} catch (\Throwable $e) {
+    echo $e->getMessage() . PHP_EOL;
+    echo $e->getTraceAsString() . PHP_EOL;
+    exit(1);
+}

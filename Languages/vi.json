@@ -1,0 +1,20 @@
+{
+    "welcome_message": "Chào mừng bạn đến với trang web của chúng tôi!",
+    "user_profile": {
+        "greeting": "Xin chào, $name!",
+        "age_info": "Bạn $age tuổi."
+    },
+    "error_messages": {
+        "404": "Không tìm thấy trang.",
+        "500": "Lỗi máy chủ nội bộ. Vui lòng thử lại sau."
+    },
+    "form_labels": {
+        "username": "Tên người dùng",
+        "password": "Mật khẩu",
+        "submit": "Gửi"
+    },
+    "notifications": {
+        "success": "Hoạt động hoàn thành thành công!",
+        "failure": "Hoạt động thất bại. Vui lòng thử lại."
+    }
+}

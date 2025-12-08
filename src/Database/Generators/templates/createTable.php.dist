@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Capsule\Manager as DB;
+use Mita\UranusHttpServer\Database\Migrations\BaseMigration;
+
+class $className extends BaseMigration
+{
+
+    protected $connection = "$connectionName";
+    
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        $this->schema->create('$tableName', function (Blueprint $table) {
+            $table->increments('id');
+            
+            
+            $table->timestamps();
+        });
+    }
+    
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        $this->schema->dropIfExists('$tableName');
+    }
+}
