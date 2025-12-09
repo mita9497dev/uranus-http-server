@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Mita\UranusHttpServer\Queue;
 
 use Mita\UranusHttpServer\Configs\Config;
@@ -23,6 +23,8 @@ class QueueManager
         switch ($driver) {
             case 'rabbitmq':
                 return new RabbitMQQueue($config, $this->logger);
+            case 'redis':
+                return new RedisQueue($config, $this->logger);
             default:
                 throw new \InvalidArgumentException("Unsupported queue driver: $driver");
         }
