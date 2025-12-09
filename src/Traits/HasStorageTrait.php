@@ -6,13 +6,13 @@ use League\Flysystem\FilesystemOperator;
 use League\Flysystem\UnableToWriteFile;
 use League\Flysystem\UnableToDeleteFile;
 use Mita\UranusHttpServer\Configs\Config;
+use Mita\UranusHttpServer\Helpers\UranusHelper;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
 trait HasStorageTrait
 {
     protected ?FilesystemOperator $filesystem = null;
-    protected static ?ContainerInterface $container = null;
 
     /**
      * Validate file trước khi upload
@@ -25,7 +25,7 @@ trait HasStorageTrait
         }
 
         $errors = [];
-        
+
         // Validate file size
         if (isset($rules['max_size'])) {
             $maxSize = $rules['max_size'] * 1024 * 1024; // Convert MB to bytes
@@ -39,7 +39,7 @@ trait HasStorageTrait
             $mimeType = $file->getClientMediaType();
             if (!in_array($mimeType, $rules['mime_types'])) {
                 $errors[] = sprintf(
-                    'File type must be one of: %s', 
+                    'File type must be one of: %s',
                     implode(', ', $rules['mime_types'])
                 );
             }
@@ -61,23 +61,14 @@ trait HasStorageTrait
         }
     }
 
-    /**
-     * Set container instance
-     */
-    public static function setContainer(ContainerInterface $container): void
-    {
-        static::$container = $container;
-    }
+
 
     /**
      * Get container instance
      */
     protected static function getContainer(): ContainerInterface
     {
-        if (static::$container === null) {
-            throw new \RuntimeException('Container has not been set');
-        }
-        return static::$container;
+        return UranusHelper::getContainer();
     }
 
     protected function getDefaultDisk(): string
@@ -123,14 +114,14 @@ trait HasStorageTrait
         try {
             // Tạo tên file unique nếu không được chỉ định
             $filename = $name ?? $this->generateUniqueFilename($file);
-            
+
             // Tạo đường dẫn đầy đủ
             $path = trim($this->getStoragePath(), '/') . '/' . $filename;
 
             // Đọc content từ PSR-7 UploadedFile
             $stream = $file->getStream();
             $content = $stream->getContents();
-            
+
             // Lưu file sử dụng Flysystem
             $this->getFilesystem()->write($path, $content, [
                 'visibility' => $this->getVisibility()
@@ -209,8 +200,16 @@ trait HasStorageTrait
     }
 
     // Hook methods
-    public function beforeStore($file): void {}
-    public function afterStore(string $path): void {}
-    public function beforeDelete(): void {}
-    public function afterDelete(): void {}
+    public function beforeStore($file): void
+    {
+    }
+    public function afterStore(string $path): void
+    {
+    }
+    public function beforeDelete(): void
+    {
+    }
+    public function afterDelete(): void
+    {
+    }
 }

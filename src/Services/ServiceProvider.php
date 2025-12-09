@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Mita\UranusHttpServer\Services;
 
 use DI\ContainerBuilder;
@@ -12,6 +12,7 @@ use Mita\UranusHttpServer\Console\ConsoleKernel;
 use Mita\UranusHttpServer\Contracts\WorkableRegistry;
 use Mita\UranusHttpServer\Extensions\TwigTranslatorExtension;
 use Mita\UranusHttpServer\Handlers\HttpErrorHandler;
+use Mita\UranusHttpServer\Helpers\UranusHelper;
 use Mita\UranusHttpServer\Middlewares\CorsMiddleware;
 use Mita\UranusHttpServer\Middlewares\CsrfMiddleware;
 use Mita\UranusHttpServer\Middlewares\CsrfMiddlewareInterface;
@@ -40,7 +41,7 @@ use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 
-class ServiceProvider 
+class ServiceProvider
 {
     public function register(ContainerBuilder $containerBuilder, Config $config, array $userDefinedServices = [])
     {
@@ -67,18 +68,18 @@ class ServiceProvider
 
         $containerBuilder->addDefinitions($userDefinedServices);
     }
-    
+
     public function registerApp(ContainerBuilder $containerBuilder)
     {
         $containerBuilder->addDefinitions([
             \Slim\App::class => function (ContainerInterface $container) {
                 $app = \Slim\Factory\AppFactory::createFromContainer($container);
-            
+
                 $basePath = $container->get(Config::class)->get('base_path');
                 $app->setBasePath($basePath);
 
-                HasStorageTrait::setContainer($container);
-                
+                UranusHelper::setContainer($container);
+
                 return $app;
             }
         ]);
@@ -112,35 +113,35 @@ class ServiceProvider
                 $capsule = new Manager();
 
                 $capsule->addConnection([
-                    'driver'    => $settings['default']['driver'],
-                    'host'      => $settings['default']['host'],
-                    'port'      => $settings['default']['port'],
-                    'database'  => $settings['default']['database'],
-                    'username'  => $settings['default']['username'],
-                    'password'  => $settings['default']['password'],
-                    'charset'   => $settings['default']['charset'],
+                    'driver' => $settings['default']['driver'],
+                    'host' => $settings['default']['host'],
+                    'port' => $settings['default']['port'],
+                    'database' => $settings['default']['database'],
+                    'username' => $settings['default']['username'],
+                    'password' => $settings['default']['password'],
+                    'charset' => $settings['default']['charset'],
                     'collation' => $settings['default']['collation'],
-                    'prefix'    => $settings['default']['prefix'],
+                    'prefix' => $settings['default']['prefix'],
                 ], 'default');
-                
+
                 foreach ($settings['connections'] as $name => $connection) {
                     $capsule->addConnection([
-                        'driver'    => $connection['driver'],
-                        'host'      => $connection['host'],
-                        'port'      => $connection['port'],
-                        'database'  => $connection['database'],
-                        'username'  => $connection['username'],
-                        'password'  => $connection['password'],
-                        'charset'   => $connection['charset'],
+                        'driver' => $connection['driver'],
+                        'host' => $connection['host'],
+                        'port' => $connection['port'],
+                        'database' => $connection['database'],
+                        'username' => $connection['username'],
+                        'password' => $connection['password'],
+                        'charset' => $connection['charset'],
                         'collation' => $connection['collation'],
-                        'prefix'    => $connection['prefix'],
+                        'prefix' => $connection['prefix'],
                     ], $name);
                 }
-        
+
                 $capsule->setAsGlobal();
-        
+
                 $capsule->bootEloquent();
-        
+
                 return $capsule;
             }
         ]);
@@ -179,7 +180,7 @@ class ServiceProvider
                 /** @var TwigExtensionManager */
                 $twigExtensionManager = $container->get(TwigExtensionManager::class);
                 $twigExtensionManager->registerExtensions($twig);
-                
+
                 return $twig;
             },
         ]);
@@ -189,10 +190,10 @@ class ServiceProvider
     {
         $containerBuilder->addDefinitions([
             TwigExtensionManager::class => function (ContainerInterface $container) {
-                $config         = $container->get(Config::class);
-                $twigConfigs    = $config->get('renderer');
-                $registrars     = $twigConfigs['extensions'] ?? [];
-                $registrars[]   = TwigTranslatorExtension::class; 
+                $config = $container->get(Config::class);
+                $twigConfigs = $config->get('renderer');
+                $registrars = $twigConfigs['extensions'] ?? [];
+                $registrars[] = TwigTranslatorExtension::class;
 
                 return new TwigExtensionManager($container, $registrars);
             },
@@ -217,7 +218,7 @@ class ServiceProvider
             }
         ]);
     }
-    
+
     public function registerValidatorService(ContainerBuilder $containerBuilder)
     {
         $containerBuilder->addDefinitions([
@@ -226,7 +227,7 @@ class ServiceProvider
             }
         ]);
     }
-    
+
     public function registerTransformerService(ContainerBuilder $containerBuilder)
     {
         $containerBuilder->addDefinitions([
@@ -274,8 +275,8 @@ class ServiceProvider
 
                 $app = $container->get(App::class);
                 $httpErrorHandler = new HttpErrorHandler(
-                    $app->getCallableResolver(), 
-                    $app->getResponseFactory(), 
+                    $app->getCallableResolver(),
+                    $app->getResponseFactory(),
                     $logger
                 );
                 $httpErrorHandler->setDebug(filter_var($config->get('app.debug'), FILTER_VALIDATE_BOOLEAN));
@@ -297,24 +298,26 @@ class ServiceProvider
         ]);
     }
 
-    public function registerJwtService(ContainerBuilder $containerBuilder) 
+    public function registerJwtService(ContainerBuilder $containerBuilder)
     {
-        $containerBuilder->addDefinitions([
-            JWTServiceInterface::class => function(ContainerInterface $container) {
-                /** @var Config $config */
-                $config = $container->get(Config::class);
-                $baseUrl = $config->get('base_url');
-                $secretKey = $config->get('jwt.secret_key');
-                $algorithm = $config->get('jwt.algorithm');
+        $containerBuilder->addDefinitions(
+            [
+                JWTServiceInterface::class => function (ContainerInterface $container) {
+                    /** @var Config $config */
+                    $config = $container->get(Config::class);
+                    $baseUrl = $config->get('base_url');
+                    $secretKey = $config->get('jwt.secret_key');
+                    $algorithm = $config->get('jwt.algorithm');
 
-                $accessTokenOptions = [
-                    'expires_at' => $config->get('jwt.access_token.expires_at'),
-                    'issued_by' => $baseUrl, 
-                    'permitted_for' => $baseUrl,
-                ];
+                    $accessTokenOptions = [
+                        'expires_at' => $config->get('jwt.access_token.expires_at'),
+                        'issued_by' => $baseUrl,
+                        'permitted_for' => $baseUrl,
+                    ];
 
-                return new JWTService($secretKey, $algorithm, $accessTokenOptions);
-            }]
+                    return new JWTService($secretKey, $algorithm, $accessTokenOptions);
+                }
+            ]
         );
     }
 
@@ -347,13 +350,13 @@ class ServiceProvider
                 $config = $container->get(Config::class);
 
                 $workableRegistry = new WorkableRegistry();
-                
+
                 $jobs = $config->get('queue.jobs', []);
                 foreach ($jobs as $job) {
                     $jobClassName = "\\" . $job;
                     $workableRegistry->register($jobClassName);
                 }
-                
+
                 $tasks = $config->get('tasks', []);
                 foreach ($tasks as $task) {
                     $taskClassName = "\\" . $task;
@@ -367,14 +370,14 @@ class ServiceProvider
         $containerBuilder->addDefinitions([
             WorkerManager::class => function (ContainerInterface $container) {
                 $loggerService = $container->get(LoggerService::class);
-                
+
                 $logger = $loggerService
                     ->addFileHandler('worker_manager.log')
                     ->createInstance('WORKER_MANAGER');
 
                 return new WorkerManager(
-                    $container->get(QueueInterface::class), 
-                    $logger, 
+                    $container->get(QueueInterface::class),
+                    $logger,
                     $container->get(WorkableRegistry::class)
                 );
             }
@@ -383,14 +386,14 @@ class ServiceProvider
         $containerBuilder->addDefinitions([
             AsyncJobManager::class => function (ContainerInterface $container) {
                 $loggerService = $container->get(LoggerService::class);
-                
+
                 $logger = $loggerService
                     ->addFileHandler('async_job_manager.log')
                     ->createInstance('ASYNC_JOB_MANAGER');
 
                 return new AsyncJobManager(
-                    $container->get(QueueInterface::class), 
-                    $logger, 
+                    $container->get(QueueInterface::class),
+                    $logger,
                     $container->get(WorkableRegistry::class),
                     $container->get(LoopInterface::class),
                     $container
@@ -412,11 +415,11 @@ class ServiceProvider
                 $config = $container->get(Config::class);
                 $settings = $config->get('session');
                 return new Session([
-                    'name'          => $settings['name'],
-                    'autorefresh'   => $settings['autorefresh'],
-                    'lifetime'      => $settings['lifetime'],
-                    'secure'        => $settings['secure'],
-                    'httponly'      => $settings['httponly']
+                    'name' => $settings['name'],
+                    'autorefresh' => $settings['autorefresh'],
+                    'lifetime' => $settings['lifetime'],
+                    'secure' => $settings['secure'],
+                    'httponly' => $settings['httponly']
                 ]);
             },
         ]);
@@ -454,20 +457,20 @@ class ServiceProvider
                 $logger = $loggerService
                     ->addFileHandler('error_middleware.log')
                     ->createInstance('ERROR_MIDDLEWARE');
-                
+
                 $errorMiddleware = new ErrorMiddleware(
                     $app->getCallableResolver(),
                     $app->getResponseFactory(),
-                    (bool)$config->get('logger.display_error_details'),
-                    (bool)$config->get('logger.log_errors'),
-                    (bool)$config->get('logger.log_error_details'),
+                    (bool) $config->get('logger.display_error_details'),
+                    (bool) $config->get('logger.log_errors'),
+                    (bool) $config->get('logger.log_error_details'),
                     $logger
                 );
                 $errorMiddleware->setDefaultErrorHandler($container->get(HttpErrorHandler::class));
                 return $errorMiddleware;
             },
         ]);
-        
+
         $containerBuilder->addDefinitions([
             CorsMiddleware::class => \DI\create(CorsMiddleware::class)
         ]);
@@ -480,9 +483,9 @@ class ServiceProvider
                 $tokenKey = $config->get('csrf.token_key');
                 $sessionKey = $config->get('csrf.session_key');
                 return new CsrfMiddleware(
-                    $container->get(Helper::class), 
-                    $lifetime, 
-                    $tokenKey, 
+                    $container->get(Helper::class),
+                    $lifetime,
+                    $tokenKey,
                     $sessionKey
                 );
             },
@@ -513,7 +516,7 @@ class ServiceProvider
             JWTAuthMiddlewareInterface::class => function (ContainerInterface $container) {
                 /** @var Config */
                 $config = $container->get(Config::class);
-                
+
                 $middleware = new JWTAuthMiddleware($container->get(JWTServiceInterface::class));
                 $middleware->setHeaderKey($config->get('auth.header_key'));
                 $middleware->setQueryKey($config->get('auth.query_key'));
