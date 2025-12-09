@@ -5,7 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Mita\\UranusHttpServer\\": "src/", 
+            "Mita\\UranusHttpServer\\": "src/",
             "Mita\\UranusHttpServerExamples\\": "examples/"
         }
     },
@@ -16,21 +16,21 @@
         }
     ],
     "minimum-stability": "stable",
-    "prefer-stable": true, 
+    "prefer-stable": true,
     "bin": [
         "uranus"
     ],
     "scripts": {
         "post-install-cmd": [
             "Mita\\UranusHttpServer\\Console\\Setup::createUranusFile"
-        ], 
+        ],
         "uranus": "php vendor/bin/uranus"
     },
     "require": {
         "php": "^7.4 || ^8.0",
         "slim/slim": "4.14",
         "php-di/php-di": "^6.4",
-        "illuminate/database": "8.12",
+        "illuminate/database": "^8.12",
         "robmorgan/phinx": "^0.14.0",
         "monolog/monolog": "^2.9",
         "sentry/sentry": "^4.9",
@@ -49,7 +49,7 @@
         "php-amqplib/php-amqplib": "^3.7",
         "react/event-loop": "^1.5",
         "league/flysystem": "^2.5"
-    }, 
+    },
     "require-dev": {
         "phpunit/phpunit": "^9.6",
         "mockery/mockery": "^1.4",
