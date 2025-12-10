@@ -22,7 +22,7 @@ class TransformerService
      * Transform a single item.
      *
      * @param mixed $data
-     * @param TransformerAbstract $transformer
+     * @param AbstractTransformer $transformer
      * @return array
      */
     public function transformItem($data, AbstractTransformer $transformer): array
@@ -35,7 +35,7 @@ class TransformerService
      * Transform a collection of items.
      *
      * @param SupportCollection $data
-     * @param TransformerAbstract $transformer
+     * @param AbstractTransformer $transformer
      * @return array
      */
     public function transformCollection(SupportCollection $data, AbstractTransformer $transformer): array
@@ -48,7 +48,7 @@ class TransformerService
      * Transform an array of items.
      *
      * @param array $data
-     * @param TransformerAbstract $transformer
+     * @param AbstractTransformer $transformer
      * @return array
      */
     public function transformArray(array $data, AbstractTransformer $transformer): array
