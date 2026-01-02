@@ -2,7 +2,7 @@
 
 use Mita\UranusHttpServer\Contracts\AuthenticatableInterface;
 
-class DefaultAuthPayload implements AbstractAuthPayload
+class DefaultAuthPayload extends AbstractAuthPayload
 {
     public function toArray(): array
     {
