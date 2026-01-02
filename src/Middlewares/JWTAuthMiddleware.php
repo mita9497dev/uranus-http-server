@@ -67,13 +67,6 @@ class JWTAuthMiddleware implements JWTAuthMiddlewareInterface
                 if ($authenticatable instanceof TokenValidatable) {
                     $request = $request->withAttribute('__authenticatable', $authenticatable);
                     $request = $request->withAttribute('__token', $token);
-
-                    if (!($login = $authenticatable->getLoginByToken($token))) {
-                        throw new HttpUnauthorizedException($request, 'Invalid or expired token');
-                    }
-                    
-                    $login->last_activity = Carbon::now();
-                    $login->save();
                 } else {
                     throw new HttpUnauthorizedException($request, 'Invalid or expired token');
                 }
